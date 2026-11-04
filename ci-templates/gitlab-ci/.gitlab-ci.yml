@@ -1,0 +1,51 @@
+# Self-hosted Renovate on GitLab CI.
+#
+# Put this in a dedicated "renovate-runner" project (recommended) or in the
+# project that should be updated. Then add a pipeline schedule
+# (Build > Pipeline schedules, or terraform/gitlab) that runs on `main`.
+#
+# CI/CD variables (Settings > CI/CD > Variables, masked + protected):
+#   RENOVATE_TOKEN             Project/group access token or bot user PAT with
+#                              scopes `api` + `write_repository`, role >= Developer
+#                              (Maintainer if Renovate must merge into protected branches).
+#   RENOVATE_GITHUB_COM_TOKEN  Read-only github.com PAT (no scopes). Renovate uses it
+#                              for release notes and to avoid github.com rate limits.
+#
+# Alternative: the community-maintained runner template
+#   include:
+#     - project: renovate-bot/renovate-runner
+#       file: /templates/renovate.gitlab-ci.yml
+# (works on gitlab.com; mirror it for self-managed instances).
+
+renovate:
+  image:
+    # The gitlabci manager updates this image tag automatically.
+    name: ghcr.io/renovatebot/renovate:44.210.2
+    entrypoint: [""]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web" # "Run pipeline" button
+  # Never run two Renovate jobs at once (schedule + manual run).
+  resource_group: renovate
+  timeout: 30m
+  variables:
+    RENOVATE_PLATFORM: gitlab
+    RENOVATE_ENDPOINT: $CI_API_V4_URL
+    # Process every project the token can see, limited to this group:
+    RENOVATE_AUTODISCOVER: "true"
+    RENOVATE_AUTODISCOVER_FILTER: "$CI_PROJECT_NAMESPACE/*"
+    # ...or list projects explicitly instead:
+    # RENOVATE_REPOSITORIES: "my-group/backend,my-group/frontend"
+    RENOVATE_GIT_AUTHOR: "Renovate Bot <renovate-bot@example.com>"
+    RENOVATE_ONBOARDING_CONFIG: '{"$$schema": "https://docs.renovatebot.com/renovate-schema.json", "extends": ["config:recommended"]}'
+    # Keep Renovate's working dir inside the build dir so it can be cached.
+    RENOVATE_BASE_DIR: $CI_PROJECT_DIR/.renovate
+    RENOVATE_REPOSITORY_CACHE: enabled
+    LOG_LEVEL: info
+    GIT_DEPTH: "1"
+  cache:
+    key: renovate-${CI_COMMIT_REF_SLUG}
+    paths:
+      - .renovate/cache/renovate/repository/
+  script:
+    - renovate

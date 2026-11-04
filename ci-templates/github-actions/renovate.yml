@@ -1,0 +1,85 @@
+# Self-hosted Renovate on GitHub Actions.
+#
+# Copy to .github/workflows/renovate.yml in the repository that should run
+# Renovate. That can be the repository itself, or one central "renovate"
+# repository that processes many repositories (see RENOVATE_AUTODISCOVER).
+#
+# Prerequisites (terraform/github automates the secret/variable part):
+#   - A GitHub App installed on the target repositories with permissions:
+#       Contents: RW, Pull requests: RW, Issues: RW, Workflows: RW,
+#       Checks: R, Commit statuses: R, Metadata: R
+#   - vars.RENOVATE_APP_CLIENT_ID    (repository/organisation variable)
+#   - secrets.RENOVATE_APP_PRIVATE_KEY (repository/organisation secret)
+#
+# Why not the built-in GITHUB_TOKEN? Pull requests created with it do NOT
+# trigger other workflows, so your CI never runs on Renovate PRs and
+# automerge waits forever. A GitHub App (or a fine-grained PAT) does not have
+# that limitation and shows up as "my-renovate-app[bot]" in the PR list.
+name: Renovate
+
+on:
+  schedule:
+    # Weekdays at 05:17 UTC. Avoid minute 0: that's when every other cron on
+    # GitHub fires and scheduled runs get delayed or dropped.
+    # This only decides WHEN Renovate runs. WHAT it may do at that moment is
+    # decided by the `schedule` option in renovate.json, so make them overlap.
+    - cron: "17 5 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: Renovate log level
+        type: choice
+        options: [info, debug]
+        default: info
+  # Re-run when someone ticks a checkbox in the Dependency Dashboard issue or
+  # in a PR body ("rebase this PR", "approve this major update", ...).
+  issues:
+    types: [edited]
+  pull_request:
+    types: [edited]
+
+# Never run two Renovate jobs at the same time against the same repositories.
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  renovate:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && github.event.issue.title == 'Dependency Dashboard') ||
+      (github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Mint a short-lived GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3.3.0
+        with:
+          client-id: ${{ vars.RENOVATE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+          # Process every repository the app is installed on in this owner:
+          owner: ${{ github.repository_owner }}
+
+      # Only needed because we read the global (self-hosted) config from this repo.
+      - uses: actions/checkout@v7.0.1
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@v46.3.12
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          configurationFile: ci-templates/config.js
+          # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
+          renovate-version: 44.210.2
+        env:
+          LOG_LEVEL: ${{ inputs.log-level || 'info' }}
+          RENOVATE_PLATFORM: github
+          # Option A: just this repository
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Option B: every repository the app is installed on
+          # RENOVATE_AUTODISCOVER: "true"
+          # RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository_owner }}/*"

@@ -1,0 +1,76 @@
+# The safety net that makes automerge possible: Renovate only automerges a PR
+# when these checks are green (and the ruleset in terraform/github requires them).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: "3.10"
+      - name: Install exactly what's in uv.lock
+        run: uv sync --locked --no-install-project
+      - name: Smoke test
+        run: uv run --no-sync python -c "import fastapi, uvicorn, pydantic, requests, sqlalchemy, alembic, psycopg2, dotenv"
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: oven-sh/setup-bun@v2.2.0
+      - name: Install exactly what's in bun.lock
+        run: bun install --frozen-lockfile
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: hashicorp/setup-terraform@v4.0.1
+      - run: terraform fmt -check -recursive
+      - name: terraform validate
+        run: |
+          for dir in infra terraform/*/; do
+            echo "::group::$dir"
+            terraform -chdir="$dir" init -backend=false -input=false
+            terraform -chdir="$dir" validate
+            echo "::endgroup::"
+          done
+
+  renovate-config:
+    runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=npm depName=renovate
+      RENOVATE_VERSION: 44.210.2
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      - name: Validate renovate.json and the workshop solutions
+        run: |
+          validate() { (cd "$1" && npx --yes --package "renovate@${RENOVATE_VERSION}" -- renovate-config-validator --strict); }
+          validate .
+          for f in session/solutions/*.json; do
+            tmp=$(mktemp -d); cp "$f" "$tmp/renovate.json"
+            echo "::group::$f"; validate "$tmp"; echo "::endgroup::"
+          done

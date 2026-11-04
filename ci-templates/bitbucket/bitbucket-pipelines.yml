@@ -1,0 +1,34 @@
+# Self-hosted Renovate on Bitbucket Pipelines (Bitbucket Cloud).
+#
+# The `renovate` custom pipeline is started by a pipeline schedule
+# (Repository settings > Pipelines > Schedules, or terraform/bitbucket).
+#
+# Repository/workspace variables (secured):
+#   RENOVATE_TOKEN             A repository/project/workspace access token with
+#                              repository:write + pullrequest:write.
+#                              (App passwords are deprecated.)
+#   RENOVATE_GITHUB_COM_TOKEN  Read-only github.com PAT, for release notes.
+#
+# Note: Bitbucket Cloud removed its issue tracker, so there is no Dependency
+# Dashboard on Bitbucket: don't rely on dependencyDashboardApproval here.
+
+pipelines:
+  custom:
+    renovate:
+      - step:
+          name: Renovate
+          # The bitbucket-pipelines manager updates this tag automatically.
+          image: ghcr.io/renovatebot/renovate:44.210.2
+          # Renovate clones repositories itself.
+          clone:
+            enabled: false
+          max-time: 30
+          script:
+            - export RENOVATE_PLATFORM=bitbucket
+            - export RENOVATE_REPOSITORIES="$BITBUCKET_REPO_FULL_NAME"
+            # ...or every repository in the workspace the token can see:
+            # - export RENOVATE_AUTODISCOVER=true
+            # - export RENOVATE_AUTODISCOVER_FILTER="$BITBUCKET_WORKSPACE/*"
+            - export RENOVATE_GIT_AUTHOR="Renovate Bot <renovate@example.com>"
+            - export LOG_LEVEL=info
+            - renovate

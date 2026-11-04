@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "customManagers:dockerfileVersions"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Anything annotated with `# renovate: datasource=... depName=...` on the line above",
+      "managerFilePatterns": [
+        "/(^|/)ci-templates/.+\\.ya?ml$/",
+        "/(^|/)\\.github/workflows/.+\\.ya?ml$/",
+        "/(^|/)azure-pipelines\\.ya?ml$/",
+        "/(^|/)buildspec\\.ya?ml$/",
+        "/(^|/)dagger/src/.+\\.py$/",
+        "/\\.tf$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)(\\s+versioning=(?<versioning>\\S+))?\\s*\\n\\s*-?\\s*[\\w.-]+\\s*[:=]\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?"
+      ]
+    }
+  ],
+  "customDatasources": {
+    "endoflife": {
+      "defaultRegistryUrlTemplate": "https://endoflife.date/api/{{packageName}}.json",
+      "transformTemplates": [
+        "{ \"releases\": $map($, function($v) { { \"version\": $v.cycle, \"releaseTimestamp\": $v.releaseDate, \"isDeprecated\": $type($v.eol) = \"string\" and $toMillis($v.eol) < $millis() } }) }"
+      ]
+    }
+  },
+  "packageRules": [
+    {
+      "description": "Regex-managed docker versions have no digest to pin: keep them as plain tags",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "pinDigests": false
+    }
+  ]
+}

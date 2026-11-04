@@ -1,0 +1,5 @@
+platform     = "github"
+repositories = ["my-org/fixing-broken-windows-with-renovate"]
+# or: repositories = [] and autodiscover_filter = "my-org/*"
+
+# use_github_com_token = true   # after putting a value in renovate/github-com-token

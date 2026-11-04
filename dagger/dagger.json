@@ -1,0 +1,8 @@
+{
+  "name": "renovate-runner",
+  "engineVersion": "v0.21.11",
+  "sdk": {
+    "source": "python"
+  },
+  "source": "."
+}

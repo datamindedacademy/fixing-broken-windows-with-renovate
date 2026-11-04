@@ -1,0 +1,41 @@
+# Self-hosted Renovate on AWS CodeBuild.
+#
+# terraform/aws-codebuild creates the CodeBuild project (privileged mode, so
+# Docker works), an EventBridge Scheduler schedule, the Secrets Manager secret
+# and IAM roles, and inlines this buildspec. The project injects:
+#   RENOVATE_PLATFORM, RENOVATE_ENDPOINT, RENOVATE_REPOSITORIES (or
+#   RENOVATE_AUTODISCOVER + RENOVATE_AUTODISCOVER_FILTER) as plain text and
+#   RENOVATE_TOKEN (+ optionally RENOVATE_GITHUB_COM_TOKEN) from Secrets Manager.
+#
+# Renovate itself is platform-agnostic: this job can update repositories on
+# GitHub, GitLab, Bitbucket, Azure DevOps, ... - CodeBuild is just the runner.
+version: 0.2
+
+env:
+  variables:
+    # CodeBuild doesn't know this is a container tag, so a regex custom manager
+    # in renovate.json keeps it up to date (see session/07).
+    # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
+    RENOVATE_VERSION: "44.210.2"
+    LOG_LEVEL: info
+    # JSON logs are much nicer to query in CloudWatch Logs Insights.
+    LOG_FORMAT: json
+
+phases:
+  pre_build:
+    commands:
+      - docker pull "ghcr.io/renovatebot/renovate:${RENOVATE_VERSION}"
+      # Optional: private packages in AWS CodeArtifact. Renovate can't mint
+      # CodeArtifact tokens itself, so do it here and pass a host rule.
+      # - export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain my-domain --query authorizationToken --output text)
+      # - export RENOVATE_HOST_RULES="[{\"matchHost\":\"my-domain-123456789012.d.codeartifact.eu-west-1.amazonaws.com\",\"hostType\":\"pypi\",\"username\":\"aws\",\"password\":\"${CODEARTIFACT_AUTH_TOKEN}\"}]"
+  build:
+    commands:
+      # `-e NAME` without a value forwards the variable only if it is set.
+      - >-
+        docker run --rm
+        -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT -e RENOVATE_TOKEN
+        -e RENOVATE_REPOSITORIES -e RENOVATE_AUTODISCOVER -e RENOVATE_AUTODISCOVER_FILTER
+        -e RENOVATE_GITHUB_COM_TOKEN -e RENOVATE_GIT_AUTHOR -e RENOVATE_HOST_RULES
+        -e LOG_LEVEL -e LOG_FORMAT
+        "ghcr.io/renovatebot/renovate:${RENOVATE_VERSION}"

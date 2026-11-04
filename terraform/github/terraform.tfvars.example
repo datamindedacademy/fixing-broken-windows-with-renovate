@@ -1,0 +1,4 @@
+owner                         = "my-github-user-or-org"
+repository                    = "fixing-broken-windows-with-renovate"
+renovate_app_client_id        = "Iv23li..."
+renovate_app_private_key_path = "~/Downloads/my-renovate.2026-11-04.private-key.pem"

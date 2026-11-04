@@ -1,0 +1,3 @@
+workspace  = "my-workspace"
+repository = "fixing-broken-windows-with-renovate"
+# Token on the command line only: TF_VAR_renovate_token=... terraform apply

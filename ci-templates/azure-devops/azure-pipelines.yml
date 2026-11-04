@@ -1,0 +1,57 @@
+# Self-hosted Renovate on Azure Pipelines (Azure DevOps Services).
+#
+# Create a pipeline from this file (terraform/azure-devops does that for you)
+# in a central "renovate" repository or in the repository to update.
+#
+# Authentication: the pipeline's own $(System.AccessToken). Grant the
+# "<Project> Build Service (<org>)" identity these permissions on the
+# repositories Renovate updates (Project settings > Repositories > Security):
+#   Read, Contribute, Contribute to pull requests, Create branch
+# and, for the Dependency Dashboard (an Azure Boards work item of type "Issue",
+# see the azureWorkItemType option), permission to create/edit work items.
+# (Or use a PAT of a dedicated bot user: scopes Code (Read & write) +
+#  Pull Request Threads + Work Items (Read) + Packaging (Read) if needed.)
+#
+# Variable group "renovate" holds RENOVATE_GITHUB_COM_TOKEN (secret).
+
+trigger: none
+pr: none
+
+schedules:
+  - cron: "17 5 * * 1-5" # UTC
+    displayName: Weekday Renovate run
+    branches:
+      include: [main]
+    always: true # run even when nothing changed in THIS repo
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: renovate
+  - name: RENOVATE_VERSION
+    # Azure Pipelines doesn't know this is a container tag, so a regex custom
+    # manager in renovate.json keeps it up to date (see session/07).
+    # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
+    value: 44.210.2
+
+steps:
+  - checkout: none # Renovate clones repositories itself
+
+  - bash: |
+      set -euo pipefail
+      docker run --rm \
+        -e RENOVATE_PLATFORM=azure \
+        -e RENOVATE_ENDPOINT="$(System.CollectionUri)" \
+        -e RENOVATE_REPOSITORIES="$(System.TeamProject)/$(Build.Repository.Name)" \
+        -e RENOVATE_GIT_AUTHOR="Renovate Bot <renovate@example.com>" \
+        -e RENOVATE_TOKEN \
+        -e RENOVATE_GITHUB_COM_TOKEN \
+        -e LOG_LEVEL=info \
+        "ghcr.io/renovatebot/renovate:$(RENOVATE_VERSION)"
+    displayName: Run Renovate
+    timeoutInMinutes: 30
+    env:
+      # Secrets are NOT exposed to scripts unless mapped explicitly.
+      RENOVATE_TOKEN: $(System.AccessToken)
+      RENOVATE_GITHUB_COM_TOKEN: $(RENOVATE_GITHUB_COM_TOKEN)

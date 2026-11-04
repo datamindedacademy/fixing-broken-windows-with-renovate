@@ -1,0 +1,58 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Brussels",
+  "schedule": [
+    "* 0-8 * * 1-5"
+  ],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "One PR for the React/Next.js family",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "next"
+      ],
+      "groupName": "react and next.js"
+    },
+    {
+      "description": "One PR for linting/formatting tools",
+      "matchPackageNames": [
+        "eslint",
+        "eslint-*",
+        "@typescript-eslint/**",
+        "prettier"
+      ],
+      "groupName": "linters"
+    },
+    {
+      "description": "All non-major Python updates in one PR",
+      "matchManagers": [
+        "pep621"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "python non-major"
+    },
+    {
+      "description": "Terraform providers: a separate label so the platform team gets pinged",
+      "matchManagers": [
+        "terraform"
+      ],
+      "addLabels": [
+        "infra"
+      ]
+    }
+  ]
+}

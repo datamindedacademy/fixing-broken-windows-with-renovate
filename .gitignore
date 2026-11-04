@@ -7,3 +7,6 @@ __pycache__/
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+out/
+renovate.log
+renovate-report.json

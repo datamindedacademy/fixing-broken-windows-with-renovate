@@ -1,0 +1,105 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Brussels",
+  "schedule": [
+    "* 0-8 * * 1-5"
+  ],
+  "minimumReleaseAge": "3 days",
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "labels": [
+    "dependencies"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "* 0-8 * * 1"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "1. Semver: non-major updates of stable (>= 1.0) packages are safe to automerge",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchCurrentVersion": "!/^(==)?v?0\\./",
+      "automerge": true
+    },
+    {
+      "description": "2. Semver: for 0.x packages a minor bump may break the API, so only automerge patches",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchCurrentVersion": "/^(==)?v?0\\./",
+      "automerge": true
+    },
+    {
+      "description": "3. Housekeeping updates without a version change: automerge silently, no PR",
+      "matchUpdateTypes": [
+        "lockFileMaintenance",
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "description": "4. Package names: type definitions can't break production, automerge even majors",
+      "matchPackageNames": [
+        "@types/**"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "5. Package names: the framework always goes through review (later rules win!)",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "next"
+      ],
+      "groupName": "react and next.js",
+      "automerge": false
+    },
+    {
+      "description": "6. Python minor versions in base images aren't semver-minor: review them",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "python",
+        "node"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "7. Infra: never automerge, and majors wait for approval in the Dependency Dashboard",
+      "matchManagers": [
+        "terraform",
+        "helmv3"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "7b. ...and their majors only get a PR after approval in the Dependency Dashboard",
+      "matchManagers": [
+        "terraform",
+        "helmv3"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}
