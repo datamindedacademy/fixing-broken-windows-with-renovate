@@ -2,6 +2,8 @@
 
 ## Before the session
 
+- [ ] Run the deck: `cd slides && npm install && npm run dev` (see [slides/README.md](../slides/README.md)).
+
 - [ ] Send [00-setup.md](00-setup.md) a few days ahead. The image pull is the long pole.
 - [ ] Do the whole lab yourself the day before **with the then-current Renovate version**: Renovate
       releases daily, and version numbers in the expected outputs drift (that's the point of the session).

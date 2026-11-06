@@ -1,0 +1,99 @@
+/* Deck-wide helpers, adapted from the containerization_with_docker deck.
+   Slidev loads style.css next to the entry deck once at startup: restart the
+   dev server after editing it. */
+
+/* Ten agenda rows have to fit on one page; the theme's default row height fits five. */
+.dm-agenda-body ol > li {
+  padding: 3px 4px !important;
+  font-size: 15px !important;
+}
+.dm-agenda-body h1:first-child {
+  padding-bottom: 8px !important;
+  margin-bottom: 14px !important;
+}
+
+/* The recap list: UnoCSS's reset strips list markers, so put the numbers back. */
+.dm-recap ol { list-style: decimal; padding-left: 26px; font-size: 18px; }
+.dm-recap li { margin-bottom: 10px; padding-left: 4px; }
+
+/* Hairline-bordered reference table. */
+.dm-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 16px; }
+.dm-table th, .dm-table td {
+  border-bottom: 1px solid rgba(84, 62, 220, 0.35);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.dm-table th { color: var(--dm-connecting); font-weight: 700; }
+.dm-table td code { font-size: 13.5px; }
+.dm-table--dense td, .dm-table--dense th { padding: 4px 8px; font-size: 13px; }
+.dm-table--dense td code { font-size: 12px; }
+
+/* Exercise slides (statement layout): one to three exercises side by side. */
+.exercise-path {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  font-family: ui-monospace, monospace;
+  font-size: 15px;
+}
+.ex-grid {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 26px;
+  text-align: left;
+}
+.ex-grid--single .ex-item { max-width: 620px; text-align: center; }
+.ex-item {
+  flex: 1 1 0;
+  max-width: 400px;
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+}
+.ex-name {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.ex-desc { font-size: 15px; line-height: 1.45; opacity: 0.9; flex: 1; }
+.ex-item .exercise-path { align-self: flex-start; font-size: 13px; }
+.ex-grid--single .ex-item .exercise-path { align-self: center; }
+
+/* Uneven column split. */
+.col-w2 { flex: 2 1 0 !important; }
+.col-w1 { flex: 1 1 0 !important; }
+
+/* Long YAML/JSON samples. */
+.tight-code pre.shiki {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  padding: 10px 14px !important;
+}
+.small-code pre.shiki {
+  font-size: 12.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* Big centred one-liner on a default slide. */
+.punchline {
+  text-align: center;
+  font-family: 'El Messiri', serif;
+  font-size: 30px;
+  line-height: 1.3;
+  margin-top: 24px;
+}
+
+/* Cover: keep the repo slug on one line. */
+.cover-url code { font-size: 15px; white-space: nowrap; }
+
+/* A centred note under a table or comparison, with breathing room. */
+.footnote { text-align: center; margin-top: 28px !important; }

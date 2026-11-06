@@ -26,6 +26,7 @@ intentionally outdated dependencies across five ecosystems for Renovate to fix.
 | 9 | [Rolling out to a whole organisation](session/09-rolling-out.md) | talk | 10' |
 |   | [Cheat sheet](session/cheatsheet.md) | reference | |
 |   | [Facilitator notes](session/facilitator-notes.md) | for trainers | |
+|   | [Slide deck](slides/) (Slidev) | for trainers | |
 
 About 3 hours including breaks. Modules 6 to 9 can be shortened to demos for
 a 2-hour slot. Solutions are in [`session/solutions/`](session/solutions/).
@@ -38,6 +39,7 @@ a 2-hour slot. Solutions are in [`session/solutions/`](session/solutions/).
 ├── renovate.json                                     ← starting config; you'll grow it in the labs
 ├── .github/workflows/ci.yml                          ← the tests that make automerge safe
 ├── session/                                          ← course modules, exercises, solutions
+├── slides/                                           ← Slidev deck that follows the modules
 ├── ci-templates/                                     ← copy-paste Renovate jobs per CI system
 │   ├── github-actions/   gitlab-ci/   azure-devops/
 │   ├── bitbucket/        aws-codebuild/
