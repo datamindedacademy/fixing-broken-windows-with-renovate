@@ -1,10 +1,4 @@
 ---
-layout: section
----
-
-# Self-hosted Renovate <span class="dm-accent">in CI</span>
-
----
 layout: default
 label: 3 · Renovate in CI
 ---
@@ -24,27 +18,6 @@ label: 3 · Renovate in CI
 <DmBanner tone="authentic" icon="i-mdi-github" title="Plus: a read-only github.com token, even if you're not on GitHub" class="mt-6">
 Release notes and many versions come from github.com, and anonymous calls get 60 per hour.
 </DmBanner>
-
----
-layout: default
-label: 3 · Renovate in CI
----
-
-# One template per <span class="dm-accent">CI system</span>
-
-<table class="dm-table">
-<tbody>
-<tr><th style="width: 21%">CI</th><th style="width: 24%">Schedule</th><th style="width: 30%">Token</th><th>Infra</th></tr>
-<tr><td>GitHub Actions</td><td><code>on.schedule</code></td><td>GitHub App token</td><td><code>terraform/github</code></td></tr>
-<tr><td>GitLab CI</td><td>Pipeline schedule</td><td>Project access token, rotated</td><td><code>terraform/gitlab</code></td></tr>
-<tr><td>Azure Pipelines</td><td><code>schedules:</code> in YAML</td><td><code>$(System.AccessToken)</code></td><td><code>terraform/azure-devops</code></td></tr>
-<tr><td>Bitbucket Pipelines</td><td>Schedule on a custom pipeline</td><td>Access token, secured variable</td><td><code>terraform/bitbucket</code></td></tr>
-<tr><td>AWS CodeBuild</td><td>EventBridge Scheduler</td><td>Secrets Manager</td><td><code>terraform/aws-codebuild</code></td></tr>
-<tr><td>Anything with Docker</td><td>Your CI's</td><td>Your CI's</td><td>Dagger, module 8</td></tr>
-</tbody>
-</table>
-
-<p class="footnote text-sm opacity-70">All in <code>ci-templates/</code>. CodeBuild can update repos on <i>any</i> platform: it's only the runner.</p>
 
 ---
 layout: default
@@ -78,49 +51,6 @@ Automerge waits forever.
 <!--
 App permissions: Contents RW, Pull requests RW, Issues RW, Workflows RW, Checks and Commit
 statuses read. A fine-grained PAT also works but is tied to a person.
--->
-
----
-layout: default
-label: 3 · Renovate in CI
----
-
-# The GitHub Actions <span class="dm-accent">workflow</span>
-
-<div class="tight-code">
-
-```yaml {all|2-4|6-8|12-16|17-24|all}
-on:
-  schedule:
-    - cron: "17 5 * * 1-5"   # weekdays, avoid minute 0
-  workflow_dispatch:
-concurrency:
-  group: renovate
-  cancel-in-progress: false
-jobs:
-  renovate:
-    runs-on: ubuntu-latest
-    steps:
-      - id: app-token
-        uses: actions/create-github-app-token@v3.3.0
-        with:
-          client-id: ${{ vars.RENOVATE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
-      - uses: renovatebot/github-action@v46.3.12
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
-          renovate-version: 44.210.2
-        env:
-          RENOVATE_REPOSITORIES: ${{ github.repository }}
-          # RENOVATE_AUTODISCOVER: "true"
-```
-
-</div>
-
-<!--
-Full file: ci-templates/github-actions/renovate.yml. The real one also re-runs when someone
-ticks a box in the Dependency Dashboard (issues: edited).
 -->
 
 ---

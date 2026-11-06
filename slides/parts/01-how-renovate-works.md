@@ -1,21 +1,4 @@
 ---
-layout: section
----
-
-# How <span class="dm-accent">Renovate</span> works
-
----
-layout: quote
----
-
-# "One unrepaired broken window invites <span class="dm-accent">more</span>."
-
-<!--
-Broken windows theory. One outdated dependency is a two-minute bump. Two years of them is a
-migration project nobody wants to own. Renovate fixes the windows while they are still small.
--->
-
----
 layout: default
 label: 1 · How Renovate works
 ---
@@ -69,26 +52,6 @@ label: 1 · How Renovate works
 Platform: where the code lives (GitHub, GitLab, Azure DevOps, Bitbucket).
 Manager: knows a file format. Datasource: knows a registry. Versioning: knows how to compare.
 -->
-
----
-layout: default
-label: 1 · How Renovate works
----
-
-# Three ways to <span class="dm-accent">run it</span>
-
-<table class="dm-table mt-6">
-<tbody>
-<tr><th style="width: 30%">Option</th><th style="width: 22%">Who runs the bot</th><th>Good for</th></tr>
-<tr><td>Mend <b>Community Cloud</b> (GitHub App)</td><td>Mend</td><td>Public and small GitHub orgs, zero ops</td></tr>
-<tr><td><b>Self-hosted in CI</b> <span class="dm-accent">← today</span></td><td>You, as a scheduled pipeline</td><td>Any platform, private registries, internal network, full control over versions and secrets</td></tr>
-<tr><td>Mend <b>Self-hosted CE/EE</b></td><td>You, as a server with webhooks</td><td>Large orgs that want instant reactions and a job queue</td></tr>
-</tbody>
-</table>
-
-<DmBanner tone="authentic" icon="i-mdi-lightbulb-outline" title="The sweet spot" class="mt-8">
-Your CI already gives you scheduling, secrets, logs and network access. No server to run.
-</DmBanner>
 
 ---
 layout: default

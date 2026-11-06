@@ -29,8 +29,9 @@ Same as the other Data Minded Academy decks:
 
 - Two-tone headings: wrap the accent words in `<span class="dm-accent">...</span>`.
 - Content slides use `layout: default` with a `label:` (`5 · Automerge`) that stays constant per section.
-- Dividers use `layout: section`. Exercise pointers use `layout: statement` with the `ex-grid`
-  cards, naming the exact file in `../session/`.
+- No section dividers: the `label:` carries the section. Exercise pointers use `layout: statement`
+  with the `ex-grid` cards, naming the exact file in `../session/`.
+- Keep it short (about 25 slides). Detail belongs in `../session/`, not on a slide.
 - No em dashes. Bold marks a single term, not a whole claim.
 - Slides render at 980x552. Anything taller silently overflows the PDF: check the export after
   adding a long code block. Use `tight-code` or split the slide.

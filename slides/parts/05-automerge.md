@@ -1,10 +1,4 @@
 ---
-layout: section
----
-
-# <span class="dm-accent">Automerge</span> the boring updates
-
----
 layout: default
 label: 5 · Automerge
 ---
@@ -33,24 +27,6 @@ Renovate turns on GitHub auto-merge (or GitLab / Azure DevOps equivalents). The 
 terraform/github creates the ruleset with the four CI jobs as required checks and turns on
 "Allow auto-merge" on the repository.
 -->
-
----
-layout: default
-label: 5 · Automerge
----
-
-# PR or <span class="dm-accent">branch</span>?
-
-<DmComparison :rows="['What happens', 'Visible', 'Needs']" :cols="['automergeType: pr', 'automergeType: branch']" class="mt-6">
-<template #r0c0>PR opened, merged when green</template>
-<template #r0c1>No PR: branch tested, then merged straight into main</template>
-<template #r1c0>Yes, traceable in the PR list</template>
-<template #r1c1>Only in git history</template>
-<template #r2c0>Required checks</template>
-<template #r2c1>Push rights to main</template>
-</DmComparison>
-
-<p class="footnote">Use <code>branch</code> for zero-risk housekeeping: lock file maintenance, digests, pins.</p>
 
 ---
 layout: default
@@ -119,33 +95,6 @@ Broad rules first, exceptions last. Conditions in one rule are AND, values in on
 <!--
 (==)? because pep621 deps are written as ==0.95.0 and a regex is matched against the value as
 written in the file. Full solution: session/solutions/05-automerge.json.
--->
-
----
-layout: default
-label: 5 · Automerge
----
-
-# Expected <span class="dm-accent">result</span>
-
-<table class="dm-table dm-table--dense">
-<tbody>
-<tr><th style="width: 22%">Dependency</th><th style="width: 18%">Current</th><th style="width: 18%">Update</th><th style="width: 16%">Automerge</th><th>Why</th></tr>
-<tr><td>zod</td><td><code>3.19.0</code></td><td>minor</td><td>✅</td><td>stable, non-major</td></tr>
-<tr><td>requests</td><td><code>==2.28.0</code></td><td>minor</td><td>✅</td><td>PEP 440 <code>==</code> prefix handled</td></tr>
-<tr><td>axios</td><td><code>0.27.0</code></td><td>minor</td><td>❌</td><td>0.x</td></tr>
-<tr><td>axios</td><td><code>0.27.0</code></td><td>patch</td><td>✅</td><td>0.x patch</td></tr>
-<tr><td>@types/node</td><td><code>18.0.0</code></td><td><b>major</b></td><td>✅</td><td>package name rule</td></tr>
-<tr><td>@types/react</td><td><code>18.0.0</code></td><td>minor</td><td>❌</td><td>framework rule comes later and wins</td></tr>
-<tr><td>python image</td><td><code>3.10.0-slim</code></td><td>minor</td><td>❌</td><td>base images reviewed</td></tr>
-<tr><td>aws provider</td><td><code>5.20.0</code></td><td>major</td><td>❌</td><td>needs dashboard approval</td></tr>
-<tr><td>lock files</td><td>–</td><td>maintenance</td><td>✅</td><td>as a branch, no PR</td></tr>
-</tbody>
-</table>
-
-<!--
-Show this only after people have tried. Every row was checked against Renovate's own
-package rule engine while building the course.
 -->
 
 ---

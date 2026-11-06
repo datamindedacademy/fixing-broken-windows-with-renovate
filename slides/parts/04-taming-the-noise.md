@@ -1,10 +1,4 @@
 ---
-layout: section
----
-
-# Taming the <span class="dm-accent">noise</span>
-
----
 layout: default
 label: 4 · Taming the noise
 ---
@@ -22,78 +16,6 @@ label: 4 · Taming the noise
 <tr><td>Overview</td><td>Dependency Dashboard</td><td>One issue with everything pending, blocked or failing</td></tr>
 </tbody>
 </table>
-
----
-layout: default
-label: 4 · Taming the noise
----
-
-# Grouping with <span class="dm-accent">matchPackageNames</span>
-
-<DmColumns class="mt-4" :gap="24">
-<DmColumn tone="plain" class="col-w2">
-
-```json
-{
-  "extends": ["config:recommended"],
-  "timezone": "Europe/Brussels",
-  "schedule": ["* 0-8 * * 1-5"],
-  "packageRules": [
-    {
-      "matchPackageNames": ["react", "react-dom",
-        "@types/react", "@types/react-dom", "next"],
-      "groupName": "react and next.js"
-    },
-    {
-      "matchPackageNames": ["eslint", "eslint-*",
-        "@typescript-eslint/**", "prettier"],
-      "groupName": "linters"
-    }
-  ]
-}
-```
-
-</DmColumn>
-<DmColumn tone="plain" divider class="col-w1">
-
-`matchPackageNames` takes
-
-- exact names
-- globs: `@types/**`
-- regexes: `"/^eslint/"`
-- negations: `"!eslint-plugin-x"`
-
-</DmColumn>
-</DmColumns>
-
----
-layout: default
-label: 4 · Taming the noise
----
-
-# Presets you'll <span class="dm-accent">want to know</span>
-
-<DmColumns class="mt-6">
-<DmColumn header="config:recommended" tone="navy">
-
-- Dependency Dashboard
-- Monorepo grouping
-- Ignores `node_modules`, test fixtures
-- Merge Confidence badges
-
-</DmColumn>
-<DmColumn header="config:best-practices" tone="violet" divider>
-
-- Everything in recommended, plus:
-- Pin Docker digests and Action SHAs
-- `minimumReleaseAge` for npm
-- Weekly lock file maintenance
-- Flag abandoned packages
-
-</DmColumn>
-</DmColumns>
-
-<p class="mt-6 text-sm opacity-70 text-center">Small ones: <code>group:allNonMajor</code>, <code>schedule:weekly</code>, <code>:automergeMinor</code>, <code>:semanticCommits</code>, …</p>
 
 ---
 layout: statement

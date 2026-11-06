@@ -1,26 +1,4 @@
 ---
-layout: section
----
-
-# Custom managers and <span class="dm-accent">custom datasources</span>
-
----
-layout: default
-label: 7 · Custom
----
-
-# When Renovate is <span class="dm-accent">blind</span>
-
-<DmComparison :rows="['Problem', 'Fix', 'Example']" :cols="['Custom manager', 'Custom datasource']" class="mt-6">
-<template #r0c0>Can't <b>find</b> the version in your file</template>
-<template #r0c1>Can't <b>look up</b> new versions from your source</template>
-<template #r1c0><code>customManagers</code>: regex or JSONata</template>
-<template #r1c1><code>customDatasources</code>: URL + JSONata transform</template>
-<template #r2c0><code>RUN pip install uv==0.1.0</code></template>
-<template #r2c1>EKS versions on endoflife.date</template>
-</DmComparison>
-
----
 layout: default
 label: 7 · Custom
 ---
@@ -60,43 +38,6 @@ Presets for the common cases: `dockerfileVersions`, `githubActionsVersions`, `gi
 
 </DmColumn>
 </DmColumns>
-
----
-layout: default
-label: 7 · Custom
----
-
-# Renovate updates <span class="dm-accent">its own runner</span>
-
-<div class="small-code">
-
-```yaml
-# ci-templates/aws-codebuild/buildspec.yml (same pattern in Azure, GitHub Actions, Dagger)
-# renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
-RENOVATE_VERSION: "44.210.2"
-```
-
-</div>
-
-One `regex` custom manager, scanning `ci-templates/`, `.github/workflows/`, `dagger/src/` and `*.tf`:
-
-<div class="small-code">
-
-```text
-#\s*renovate:\s*datasource=(?<datasource>\S+)\s+depName=(?<depName>\S+)
-(\s+versioning=(?<versioning>\S+))?\s*\n
-\s*-?\s*[\w.-]+\s*[:=]\s*["']?(?<currentValue>[^"'\s]+)["']?
-```
-
-</div>
-
-<p class="text-sm opacity-70">One string in <code>matchStrings</code>, split here for reading. In JSON every <code>\</code> doubles. Full config: <code>session/solutions/07-custom-managers.json</code></p>
-
-<!--
-Named groups Renovate needs: datasource, depName (or packageName), currentValue. Test on
-regex101 with the ECMAScript flavour, then double every backslash for JSON.
-Gotcha with config:best-practices: add matchManagers custom.regex + pinDigests false.
--->
 
 ---
 layout: default
